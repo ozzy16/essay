@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1E40AF">
+<title>Essay Writer — B1/B2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bl:#1E40AF;--bll:#EFF6FF;--bld:#1E3A5F;
+  --bl2:#3B82F6;--bl3:#DBEAFE;
+  --gr:#059669;--grl:#ECFDF5;--grd:#064E3B;
+  --am:#D97706;--aml:#FFFBEB;--amd:#78350F;
+  --re:#DC2626;--rel:#FEF2F2;--red:#7F1D1D;
+  --pu:#7C3AED;--pul:#F5F3FF;--pud:#3B0764;
+  --ink:#111827;--ink2:#4B5563;--ink3:#9CA3AF;
+  --paper:#F9FAFB;--surf:#FFFFFF;
+  --bd:rgba(17,24,39,0.08);--bd2:rgba(17,24,39,0.15);
+  --r:12px;--rsm:8px;
+  --safe-b:env(safe-area-inset-bottom,0px);
+}
+@media(prefers-color-scheme:dark){:root{
+  --ink:#F9FAFB;--ink2:#9CA3AF;--ink3:#6B7280;
+  --paper:#111827;--surf:#1F2937;
+  --bd:rgba(249,250,251,0.08);--bd2:rgba(249,250,251,0.15);
+  --bll:rgba(30,64,175,0.18);--bl3:rgba(59,130,246,0.15);
+  --grl:rgba(5,150,105,0.15);--aml:rgba(217,119,6,0.13);
+  --rel:rgba(220,38,38,0.13);--pul:rgba(124,58,237,0.15);
+}}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding-bottom:calc(64px + var(--safe-b))}
+.app{max-width:860px;margin:0 auto;padding:1.5rem 1rem 2rem}
+
+/* Header */
+.hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.75rem;flex-wrap:wrap;gap:12px}
+.hdr-left{display:flex;align-items:center;gap:12px}
+.hdr-icon{width:42px;height:42px;background:var(--bl);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.hdr-title{font-family:'Playfair Display',serif;font-size:24px;color:var(--ink)}
+.hdr-title span{color:var(--bl2);font-style:italic}
+.level-badge{background:var(--bll);color:var(--bld);font-size:11px;font-weight:500;padding:4px 10px;border-radius:20px;border:1px solid var(--bl3)}
+
+/* Tabs */
+.tabs{display:flex;gap:4px;background:var(--surf);border:1px solid var(--bd);border-radius:var(--r);padding:4px;margin-bottom:1.5rem;overflow-x:auto}
+.tab{flex:1;min-width:100px;padding:9px 8px;border:none;border-radius:9px;font-size:12px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--ink2);background:none;transition:all 0.2s;white-space:nowrap;text-align:center}
+.tab.active{background:var(--bl);color:white}
+
+/* Pages */
+.page{display:none}
+.page.active{display:block}
+
+/* Section label */
+.slabel{font-size:11px;font-weight:500;color:var(--ink3);letter-spacing:0.08em;text-transform:uppercase;margin-bottom:10px;margin-top:1.5rem}
+.slabel:first-child{margin-top:0}
+
+/* Cards */
+.card{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r);padding:1.25rem;margin-bottom:12px}
+
+/* Essay editor */
+.editor-wrap{display:grid;grid-template-columns:1fr 280px;gap:14px;align-items:start}
+@media(max-width:700px){.editor-wrap{grid-template-columns:1fr}}
+.editor-main{}
+.topic-row{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.topic-input{flex:1;min-width:200px;padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--bd2);background:var(--surf);color:var(--ink);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;transition:border 0.15s}
+.topic-input:focus{border-color:var(--bl2)}
+.type-select{padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--bd2);background:var(--surf);color:var(--ink);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;cursor:pointer}
+.essay-textarea{width:100%;min-height:340px;padding:16px;border-radius:var(--rsm);border:1px solid var(--bd2);background:var(--surf);color:var(--ink);font-size:15px;font-family:'DM Sans',sans-serif;line-height:1.75;resize:vertical;outline:none;transition:border 0.15s}
+.essay-textarea:focus{border-color:var(--bl2)}
+.essay-footer{display:flex;align-items:center;justify-content:space-between;margin-top:10px;flex-wrap:wrap;gap:8px}
+.word-count{font-size:12px;color:var(--ink3)}
+.word-count span{font-weight:500;color:var(--ink)}
+.analyze-btn{padding:11px 22px;background:var(--bl);color:white;border:none;border-radius:20px;font-size:13px;font-weight:500;cursor:pointer;font-family:'DM Sans',sans-serif;transition:background 0.15s;display:flex;align-items:center;gap:7px}
+.analyze-btn:hover{background:#1D4ED8}
+.analyze-btn:disabled{opacity:0.5;cursor:not-allowed}
+.clear-btn{padding:11px 16px;background:none;border:1px solid var(--bd2);color:var(--ink2);border-radius:20px;font-size:13px;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.clear-btn:hover{border-color:var(--re);color:var(--re)}
+
+/* Sidebar */
+.sidebar{}
+.structure-guide{background:var(--bll);border:1px solid var(--bl3);border-radius:var(--r);padding:1rem;margin-bottom:12px}
+.sg-title{font-size:12px;font-weight:500;color:var(--bld);margin-bottom:10px;text-transform:uppercase;letter-spacing:0.06em}
+.sg-part{display:flex;align-items:flex-start;gap:8px;margin-bottom:10px;padding-bottom:10px;border-bottom:1px solid var(--bl3)}
+.sg-part:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+.sg-num{width:22px;height:22px;border-radius:50%;background:var(--bl);color:white;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.sg-info{}
+.sg-name{font-size:13px;font-weight:500;color:var(--bld)}
+.sg-desc{font-size:11px;color:#3B82F6;margin-top:2px;line-height:1.5}
+
+/* Word suggestions */
+.word-cats{display:flex;flex-direction:column;gap:8px}
+.wcat{background:var(--surf);border:1px solid var(--bd);border-radius:var(--rsm);overflow:hidden}
+.wcat-head{padding:8px 12px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:space-between;user-select:none}
+.wcat-head:hover{background:var(--paper)}
+.wcat-body{padding:4px 12px 10px;display:none}
+.wcat-body.open{display:block}
+.wcat-words{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px}
+.wword{font-size:12px;padding:3px 9px;border-radius:20px;border:1px solid var(--bd);background:var(--paper);color:var(--ink2);cursor:pointer;transition:all 0.15s;font-family:'DM Mono',monospace}
+.wword:hover{background:var(--bll);border-color:var(--bl2);color:var(--bld)}
+
+/* Feedback */
+.feedback-section{margin-top:1.25rem}
+.score-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:14px}
+.score-box{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r);padding:12px 8px;text-align:center}
+.score-num{font-family:'Playfair Display',serif;font-size:28px;line-height:1}
+.score-lbl{font-size:10px;font-weight:500;color:var(--ink3);margin-top:4px;text-transform:uppercase;letter-spacing:0.05em}
+.score-a{color:var(--gr)}
+.score-b{color:var(--bl2)}
+.score-c{color:var(--am)}
+.score-d{color:var(--re)}
+.fb-card{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r);padding:1.25rem;margin-bottom:10px}
+.fb-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.fb-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.fb-title{font-size:14px;font-weight:500;color:var(--ink)}
+.fb-body{font-size:14px;line-height:1.7;color:var(--ink2)}
+.fb-body ul{padding-left:18px;margin-top:6px}
+.fb-body li{margin-bottom:5px}
+.highlight-wrap{position:relative}
+.corrected-text{background:var(--grl);border:1px solid rgba(5,150,105,0.2);border-radius:var(--rsm);padding:14px 16px;font-size:14px;line-height:1.75;color:var(--ink);white-space:pre-wrap;margin-top:8px}
+.loading-card{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r);padding:2rem;text-align:center;display:none}
+.loading-card.show{display:block}
+.ld-dots{display:inline-flex;gap:5px;margin-bottom:12px}
+.ld-dots span{width:8px;height:8px;border-radius:50%;background:var(--bl);animation:bounce 1.2s infinite}
+.ld-dots span:nth-child(2){animation-delay:0.2s}
+.ld-dots span:nth-child(3){animation-delay:0.4s}
+@keyframes bounce{0%,80%,100%{transform:scale(0.6);opacity:0.4}40%{transform:scale(1);opacity:1}}
+.ld-msg{font-size:14px;color:var(--ink2)}
+
+/* Structure guide page */
+.essay-type-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:1.25rem}
+.et-btn{padding:7px 14px;border-radius:20px;border:1px solid var(--bd2);background:none;font-size:12px;font-weight:500;cursor:pointer;color:var(--ink2);font-family:'DM Sans',sans-serif;transition:all 0.15s}
+.et-btn.active{background:var(--bl);color:white;border-color:var(--bl)}
+.structure-full{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden}
+.sf-part{padding:1.25rem;border-bottom:1px solid var(--bd)}
+.sf-part:last-child{border-bottom:none}
+.sf-header{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.sf-num{width:28px;height:28px;border-radius:50%;background:var(--bl);color:white;font-size:12px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.sf-name{font-size:15px;font-weight:500;color:var(--ink)}
+.sf-lines{font-size:12px;color:var(--ink3);margin-left:auto}
+.sf-desc{font-size:13px;color:var(--ink2);line-height:1.65;margin-bottom:10px}
+.sf-example{background:var(--bll);border-left:3px solid var(--bl2);border-radius:0 var(--rsm) var(--rsm) 0;padding:10px 14px;font-size:13px;color:var(--bld);font-style:italic;line-height:1.6}
+.sf-tips{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.sf-tip{background:var(--paper);border:1px solid var(--bd);border-radius:20px;padding:4px 10px;font-size:11px;color:var(--ink2)}
+
+/* Phrases page */
+.phrase-search{width:100%;padding:10px 14px;border-radius:var(--rsm);border:1px solid var(--bd2);background:var(--surf);color:var(--ink);font-size:14px;font-family:'DM Sans',sans-serif;outline:none;margin-bottom:1rem;transition:border 0.15s}
+.phrase-search:focus{border-color:var(--bl2)}
+.phrase-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px}
+.phrase-card{background:var(--surf);border:1px solid var(--bd);border-radius:var(--r);padding:1rem}
+.pc-cat{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;padding:3px 8px;border-radius:20px;display:inline-block}
+.pc-phrases{display:flex;flex-direction:column;gap:6px}
+.pc-phrase{display:flex;align-items:flex-start;gap:8px;padding:7px 10px;background:var(--paper);border-radius:var(--rsm);cursor:pointer;transition:background 0.15s}
+.pc-phrase:hover{background:var(--bll)}
+.pc-text{font-size:13px;color:var(--ink);font-family:'DM Mono',monospace;line-height:1.4;flex:1}
+.pc-copy{font-size:10px;color:var(--ink3);flex-shrink:0;margin-top:2px}
+
+/* Bottom nav */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--surf);border-top:1px solid var(--bd);display:flex;padding:8px 4px calc(8px + var(--safe-b));z-index:50}
+.bnav-btn{flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--ink3);font-family:'DM Sans',sans-serif;padding:4px;transition:color 0.15s;font-weight:500}
+.bnav-btn.active{color:var(--bl)}
+.bnav-btn svg{width:20px;height:20px}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="hdr">
+    <div class="hdr-left">
+      <div class="hdr-icon">✍️</div>
+      <div>
+        <div class="hdr-title">Essay <span>Writer</span></div>
+        <div style="font-size:12px;color:var(--ink3)">AI-powered writing assistant</div>
+      </div>
+    </div>
+    <div class="level-badge">B1 · B2 Level</div>
+  </div>
+
+  <!-- WRITE PAGE -->
+  <div class="page active" id="page-write">
+    <div class="editor-wrap">
+      <div class="editor-main">
+        <div class="topic-row">
+          <input class="topic-input" id="topic-input" placeholder="Essay topic / question (e.g. Should students use phones in school?)" />
+          <select class="type-select" id="type-select">
+            <option value="opinion">Opinion Essay</option>
+            <option value="argumentative">Argumentative</option>
+            <option value="descriptive">Descriptive</option>
+            <option value="narrative">Narrative</option>
+            <option value="for-against">For & Against</option>
+          </select>
+        </div>
+        <textarea class="essay-textarea" id="essay-ta" placeholder="Start writing your essay here...&#10;&#10;Tip: Aim for 150-200 words for B1, 200-250 words for B2." oninput="updWordCount()"></textarea>
+        <div class="essay-footer">
+          <div class="word-count">Words: <span id="wc">0</span> / <span id="wc-target">200</span></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="clear-btn" onclick="clearEssay()">Clear</button>
+            <button class="analyze-btn" id="analyze-btn" onclick="analyzeEssay()">
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1l2 4.5H15l-4 3 1.5 5L8 11l-4.5 2.5L5 8.5 1 5.5h5z" stroke="white" stroke-width="1.3" stroke-linejoin="round"/></svg>
+              Analyze Essay
+            </button>
+          </div>
+        </div>
+        <div class="loading-card" id="loading-card">
+          <div class="ld-dots"><span></span><span></span><span></span></div>
+          <div class="ld-msg" id="ld-msg">Analyzing your essay...</div>
+        </div>
+        <div class="feedback-section" id="feedback-section" style="display:none"></div>
+      </div>
+
+      <div class="sidebar">
+        <div class="structure-guide" id="sidebar-guide">
+          <div class="sg-title" id="sg-title">Opinion Essay Structure</div>
+          <div id="sg-parts"></div>
+        </div>
+        <div class="card" style="padding:1rem">
+          <div style="font-size:12px;font-weight:500;color:var(--ink3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px">Useful connectors</div>
+          <div class="wcat-words" id="quick-words"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STRUCTURE PAGE -->
+  <div class="page" id="page-structure">
+    <div class="essay-type-tabs" id="type-tabs"></div>
+    <div class="structure-full" id="structure-full"></div>
+  </div>
+
+  <!-- PHRASES PAGE -->
+  <div class="page" id="page-phrases">
+    <input class="phrase-search" placeholder="Search phrases..." oninput="searchPhrases(this.value)" />
+    <div class="phrase-grid" id="phrase-grid"></div>
+  </div>
+
+</div>
+
+<!-- Bottom nav -->
+<nav class="bnav">
+  <button class="bnav-btn active" id="nav-write" onclick="goPage('write',this)">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M14 2l4 4-10 10H4v-4L14 2z" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>
+    Write
+  </button>
+  <button class="bnav-btn" id="nav-structure" onclick="goPage('structure',this)">
+    <svg viewBox="0 0 20 20" fill="none"><rect x="3" y="3" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="3" y="9" width="10" height="2.5" rx="1" stroke="currentColor" stroke-width="1.4"/><rect x="3" y="14.5" width="7" height="2.5" rx="1" stroke="currentColor" stroke-width="1.4"/></svg>
+    Structure
+  </button>
+  <button class="bnav-btn" id="nav-phrases" onclick="goPage('phrases',this)">
+    <svg viewBox="0 0 20 20" fill="none"><path d="M4 6h12M4 10h8M4 14h10" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+    Phrases
+  </button>
+</nav>
+
+<script>
+// ---- Data ----
+const STRUCTURES = {
+  opinion:{
+    name:'Opinion Essay',
+    parts:[
+      {name:'Introduction',lines:'3-4 sentences',desc:'Introduce the topic and state your opinion clearly. Use a hook sentence to grab attention.',example:'Many people believe that technology has changed education. In my opinion, using phones in school has both advantages and disadvantages, but I believe the benefits outweigh the drawbacks.',tips:['Start with a general statement','State your opinion in the last sentence','Use: "In my opinion / I believe / I think"']},
+      {name:'Body Paragraph 1',lines:'4-5 sentences',desc:'Present your first and strongest argument. Support it with an example or explanation.',example:'Firstly, smartphones can be valuable learning tools. Students can access dictionaries, educational apps, and research information instantly. For example, language learning apps help students practise vocabulary outside school hours.',tips:['Start with: "Firstly / To begin with"','Give one clear argument','Support with example: "For example / For instance"']},
+      {name:'Body Paragraph 2',lines:'4-5 sentences',desc:'Present your second argument. You can also address a counter-argument here.',example:'Furthermore, phones help students stay organised. They can set reminders, take notes, and manage their timetable effectively. However, some argue that phones cause distraction, which is a valid concern.',tips:['Start with: "Furthermore / In addition / Moreover"','Acknowledge other views: "However / On the other hand"']},
+      {name:'Conclusion',lines:'3-4 sentences',desc:'Summarise your main points and restate your opinion. Do not introduce new ideas.',example:'In conclusion, while phones can be misused, they offer significant benefits as learning tools. I strongly believe that with proper guidelines, smartphones can enhance the educational experience.',tips:['Start with: "In conclusion / To sum up"','Restate opinion differently','No new arguments']}
+    ]
+  },
+  argumentative:{
+    name:'Argumentative Essay',
+    parts:[
+      {name:'Introduction',lines:'3-4 sentences',desc:'Present the issue and your thesis statement clearly.',example:'The debate over whether homework should be abolished has gained significant attention in recent years. This essay will argue that excessive homework negatively affects students\' wellbeing and should be reduced.',tips:['Present both sides exist','End with clear thesis','Avoid saying "I" — use "this essay will..."']},
+      {name:'Arguments For',lines:'5-6 sentences',desc:'Present 2-3 strong arguments supporting your position with evidence.',example:'There are several compelling reasons to reduce homework. First, research shows that students who sleep more perform better academically. Additionally, free time allows children to develop social skills and pursue hobbies.',tips:['Use facts and statistics if possible','Link sentences with connectors','Each argument = one clear point']},
+      {name:'Counter-arguments',lines:'4-5 sentences',desc:'Acknowledge opposing views but refute them effectively.',example:'Opponents argue that homework reinforces learning. While this may be true to some extent, studies suggest that the quality of homework matters more than the quantity. Simply assigning pages of exercises has little educational value.',tips:['Use: "Opponents argue / Critics claim"','Then refute: "However / Nevertheless / Despite this"','Show you understand both sides']},
+      {name:'Conclusion',lines:'3-4 sentences',desc:'Restate your argument and call for action or change.',example:'In conclusion, the evidence clearly suggests that homework should be reduced significantly. Schools and governments should work together to create more balanced and effective study policies.',tips:['Summarise key arguments','Restate thesis in different words','Optional: call to action']}
+    ]
+  },
+  descriptive:{
+    name:'Descriptive Essay',
+    parts:[
+      {name:'Introduction',lines:'3-4 sentences',desc:'Set the scene and introduce what you are describing. Create atmosphere.',example:'The moment I stepped into my grandmother\'s kitchen, I was immediately surrounded by the warm scent of freshly baked bread and cinnamon. This small, cosy room holds some of my most precious childhood memories.',tips:['Use sensory language (sight, smell, sound)','Create a vivid first impression','Hook the reader emotionally']},
+      {name:'Main Description 1',lines:'4-5 sentences',desc:'Describe the subject in detail — appearance, atmosphere, or first impressions.',example:'The kitchen was a modest room with pale yellow walls and a large wooden table at its centre. Bunches of dried herbs hung from the ceiling, and sunlight filtered through the lace curtains, casting gentle shadows on the tiled floor.',tips:['Use adjectives: "vast / cosy / vibrant"','Describe from general to specific','Use comparisons: "as bright as / like a..."']},
+      {name:'Main Description 2',lines:'4-5 sentences',desc:'Describe emotions, memories, or significance connected to the subject.',example:'What made this kitchen truly special was the warmth I always felt there. My grandmother would hum softly while cooking, and the sound of her voice mixed with the bubbling of pots created a symphony of comfort that I can still hear today.',tips:['Include feelings and emotions','Use: "What made it special was..."','Show, don\'t tell']},
+      {name:'Conclusion',lines:'3-4 sentences',desc:'Reflect on the significance and leave a lasting impression.',example:'Even now, years later, the memory of that kitchen fills me with a sense of peace and belonging. Some places are not just rooms — they are the spaces where our most important stories are written.',tips:['End with a reflective thought','Connect to broader meaning','Leave the reader thinking']}
+    ]
+  },
+  narrative:{
+    name:'Narrative Essay',
+    parts:[
+      {name:'Introduction / Setting',lines:'3-4 sentences',desc:'Set the scene, introduce characters, and hint at the story to come.',example:'It was an ordinary Tuesday morning when everything changed. I had just sat down for breakfast when my phone rang — it was a number I did not recognise, but I answered anyway.',tips:['Establish time, place, characters','Create intrigue or tension','Use past tense consistently']},
+      {name:'Rising Action',lines:'5-6 sentences',desc:'Develop the events leading to the main moment. Build tension.',example:'The voice on the other end was calm but urgent. "You have been selected," the woman said. My heart began to race as she explained that my short story had won a national writing competition.',tips:['Use time connectors: "Then / Suddenly / A few minutes later"','Show character\'s thoughts and feelings','Build up to the climax']},
+      {name:'Climax & Resolution',lines:'4-5 sentences',desc:'The key moment and how it resolves. Show change or realisation.',example:'Standing on stage in front of hundreds of people, I realised that my love of writing had taken me further than I had ever imagined. When I held the trophy, my hands were shaking, but my heart was full.',tips:['Make the climax emotionally impactful','Show transformation or realisation','Use vivid, specific details']},
+      {name:'Conclusion / Reflection',lines:'3-4 sentences',desc:'Reflect on what was learned or how the experience changed you.',example:'That day taught me that sharing your voice, even when it feels small, can lead to extraordinary things. I returned home a different person — one who finally believed in the power of their own words.',tips:['Connect to a life lesson','Use: "That experience taught me..."','End on a meaningful note']}
+    ]
+  },
+  'for-against':{
+    name:'For & Against Essay',
+    parts:[
+      {name:'Introduction',lines:'3-4 sentences',desc:'Introduce the topic neutrally. Do not state your opinion yet.',example:'The question of whether social media does more harm than good has been widely discussed in recent years. There are convincing arguments on both sides of this debate.',tips:['Stay neutral in the introduction','Present the issue as debatable','Do NOT say "I think" yet']},
+      {name:'Arguments For',lines:'4-5 sentences',desc:'Present the arguments in favour, clearly and logically.',example:'On the one hand, social media has several clear benefits. It allows people to stay connected with family and friends across the world. Moreover, it provides a platform for small businesses to reach wider audiences at low cost.',tips:['Use: "On the one hand / One advantage is"','Give 2-3 clear points','Support each point briefly']},
+      {name:'Arguments Against',lines:'4-5 sentences',desc:'Present the arguments against, with equal depth.',example:'On the other hand, there are serious concerns about social media. Cyberbullying has become increasingly common, particularly among teenagers. Furthermore, excessive use has been linked to anxiety and poor mental health.',tips:['Use: "On the other hand / One disadvantage is"','Match the strength of arguments','Be fair and balanced']},
+      {name:'Conclusion',lines:'3-4 sentences',desc:'Summarise both sides and give your final balanced view.',example:'In conclusion, while social media offers undeniable benefits in terms of communication and business, the risks to mental health and safety cannot be ignored. It is essential that users, especially young people, use these platforms responsibly.',tips:['Summarise both sides','Give a balanced final view','You can give your opinion here']}
+    ]
+  }
+};
+
+const PHRASES = [
+  {cat:'Introducing Opinion',color:'#DBEAFE',tc:'#1E3A5F',phrases:['In my opinion,','I strongly believe that','From my point of view,','It seems to me that','I am convinced that','As far as I am concerned,']},
+  {cat:'Adding Points',color:'#ECFDF5',tc:'#064E3B',phrases:['Furthermore,','In addition to this,','Moreover,','What is more,','Not only that, but also','Besides,']},
+  {cat:'Contrasting',color:'#FEF3C7',tc:'#78350F',phrases:['However,','On the other hand,','Despite this,','Nevertheless,','Although this is true,','In contrast,']},
+  {cat:'Giving Examples',color:'#F5F3FF',tc:'#3B0764',phrases:['For example,','For instance,','To illustrate this,','A clear example of this is','This is evident in','Such as']},
+  {cat:'Cause & Effect',color:'#FEF2F2',tc:'#7F1D1D',phrases:['As a result,','Therefore,','Consequently,','This leads to','Due to this,','Because of']},
+  {cat:'Concluding',color:'#F0FDF4',tc:'#14532D',phrases:['In conclusion,','To sum up,','To conclude,','All things considered,','On balance,','Taking everything into account,']},
+  {cat:'Sequencing',color:'#EFF6FF',tc:'#1E3A5F',phrases:['First of all,','Secondly,','Thirdly,','Finally,','To begin with,','Last but not least,']},
+  {cat:'Emphasis',color:'#FFF7ED',tc:'#7C2D12',phrases:['It is worth noting that','Clearly,','Obviously,','Undoubtedly,','It is important to emphasise','Above all,']}
+];
+
+const QUICK_CONNECTORS = ['However,','Furthermore,','In addition,','Therefore,','For example,','In conclusion,','Moreover,','Nevertheless,'];
+
+// ---- Init ----
+function init(){
+  renderSidebarGuide('opinion');
+  renderQuickWords();
+  renderTypeTabs();
+  renderStructure('opinion');
+  renderPhrases('');
+  document.getElementById('type-select').addEventListener('change', e => {
+    renderSidebarGuide(e.target.value);
+  });
+}
+
+// ---- Sidebar guide ----
+const SG_SHORT = {
+  opinion:['Introduction','Body 1','Body 2','Conclusion'],
+  argumentative:['Introduction','Arguments For','Counter-arguments','Conclusion'],
+  descriptive:['Introduction','Description 1','Description 2','Conclusion'],
+  narrative:['Setting','Rising Action','Climax','Reflection'],
+  'for-against':['Introduction','For','Against','Conclusion']
+};
+
+function renderSidebarGuide(type){
+  const s=STRUCTURES[type];
+  document.getElementById('sg-title').textContent=s.name+' Structure';
+  document.getElementById('sg-parts').innerHTML=s.parts.map((p,i)=>`
+    <div class="sg-part">
+      <div class="sg-num">${i+1}</div>
+      <div class="sg-info">
+        <div class="sg-name">${p.name}</div>
+        <div class="sg-desc">${p.lines} · ${p.tips[0]}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderQuickWords(){
+  document.getElementById('quick-words').innerHTML=QUICK_CONNECTORS.map(w=>
+    `<span class="wword" onclick="insertWord('${w}')">${w}</span>`).join('');
+}
+
+function insertWord(w){
+  const ta=document.getElementById('essay-ta');
+  const pos=ta.selectionStart;
+  const val=ta.value;
+  ta.value=val.slice(0,pos)+(pos>0&&val[pos-1]!==' '?' ':'')+w+' '+val.slice(pos);
+  ta.focus();
+  updWordCount();
+}
+
+// ---- Word count ----
+function updWordCount(){
+  const words=document.getElementById('essay-ta').value.trim().split(/\s+/).filter(w=>w).length;
+  document.getElementById('wc').textContent=words;
+  const type=document.getElementById('type-select').value;
+  document.getElementById('wc-target').textContent='200';
+}
+
+function clearEssay(){
+  if(confirm('Clear the essay?')){
+    document.getElementById('essay-ta').value='';
+    document.getElementById('topic-input').value='';
+    document.getElementById('feedback-section').style.display='none';
+    updWordCount();
+  }
+}
+
+// ---- Analyze ----
+async function analyzeEssay(){
+  const essay=document.getElementById('essay-ta').value.trim();
+  const topic=document.getElementById('topic-input').value.trim();
+  const type=document.getElementById('type-select').value;
+  if(essay.length<50){ alert('Please write at least 50 words before analyzing.'); return; }
+
+  const btn=document.getElementById('analyze-btn');
+  btn.disabled=true;
+  document.getElementById('feedback-section').style.display='none';
+  const lc=document.getElementById('loading-card');
+  lc.classList.add('show');
+
+  const msgs=[
+    'Reading your essay...',
+    'Checking grammar and vocabulary...',
+    'Evaluating structure and coherence...',
+    'Generating detailed feedback...'
+  ];
+  let mi=0;
+  const lint=setInterval(()=>{ document.getElementById('ld-msg').textContent=msgs[Math.min(mi++,msgs.length-1)]; },1800);
+
+  const prompt=`You are an experienced English teacher evaluating a ${type} essay written by a B1/B2 level student.
+
+Topic: "${topic||'General essay'}"
+Essay type: ${type}
+Student's essay:
+"""
+${essay}
+"""
+
+Evaluate this essay and respond ONLY in this exact JSON format (no other text):
+{
+  "scores": {
+    "content": 8,
+    "grammar": 7,
+    "vocabulary": 7,
+    "structure": 8
+  },
+  "overall": "B1+",
+  "strengths": ["strength 1", "strength 2", "strength 3"],
+  "improvements": ["improvement 1", "improvement 2", "improvement 3"],
+  "grammar_errors": ["Error: 'he go' → Correction: 'he goes' — Reason: third person singular", "..."],
+  "vocabulary_suggestions": ["Instead of 'good', try: 'beneficial / effective / valuable'", "..."],
+  "corrected_intro": "A suggested improved version of the first paragraph only",
+  "encouragement": "One warm, motivating sentence for the student"
+}
+
+Scores are out of 10. Be constructive and encouraging. Focus on B1-B2 level expectations.`;
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1500,
+        system:'You are a helpful English teacher. Always respond with valid JSON only.',
+        messages:[{role:'user',content:prompt}]
+      })
+    });
+    clearInterval(lint);
+    if(!res.ok){ const e=await res.json().catch(()=>({})); throw new Error(e.error?.message||`HTTP ${res.status}`); }
+    const data=await res.json();
+    const txt=(data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('');
+    let fb={};
+    try{ const m=txt.match(/\{[\s\S]*\}/); if(m) fb=JSON.parse(m[0]); } catch(e){ throw new Error('Could not parse feedback. Please try again.'); }
+    renderFeedback(fb);
+  }catch(err){
+    clearInterval(lint);
+    document.getElementById('feedback-section').innerHTML=`<div class="card" style="border-color:var(--re)"><div style="font-size:14px;font-weight:500;color:var(--re);margin-bottom:6px">Could not analyze</div><div style="font-size:13px;color:var(--ink2)">${err.message}</div></div>`;
+    document.getElementById('feedback-section').style.display='block';
+  }
+
+  lc.classList.remove('show');
+  btn.disabled=false;
+}
+
+function renderFeedback(fb){
+  const sec=document.getElementById('feedback-section');
+  const scores=fb.scores||{content:0,grammar:0,vocabulary:0,structure:0};
+  const colorFor=n=>n>=8?'score-a':n>=6?'score-b':n>=4?'score-c':'score-d';
+  sec.innerHTML=`
+    <div class="score-row">
+      <div class="score-box"><div class="score-num ${colorFor(scores.content)}">${scores.content}<span style="font-size:14px">/10</span></div><div class="score-lbl">Content</div></div>
+      <div class="score-box"><div class="score-num ${colorFor(scores.grammar)}">${scores.grammar}<span style="font-size:14px">/10</span></div><div class="score-lbl">Grammar</div></div>
+      <div class="score-box"><div class="score-num ${colorFor(scores.vocabulary)}">${scores.vocabulary}<span style="font-size:14px">/10</span></div><div class="score-lbl">Vocabulary</div></div>
+      <div class="score-box"><div class="score-num ${colorFor(scores.structure)}">${scores.structure}<span style="font-size:14px">/10</span></div><div class="score-lbl">Structure</div></div>
+    </div>
+    ${fb.encouragement?`<div class="card" style="background:var(--grl);border-color:rgba(5,150,105,0.2);margin-bottom:10px"><div style="display:flex;align-items:center;gap:8px"><span style="font-size:18px">⭐</span><div style="font-size:14px;color:var(--grd);line-height:1.6">${fb.encouragement}</div></div></div>`:''}
+    <div class="fb-card">
+      <div class="fb-head"><div class="fb-icon" style="background:var(--grl)">✅</div><div class="fb-title">What you did well</div></div>
+      <div class="fb-body"><ul>${(fb.strengths||[]).map(s=>`<li>${s}</li>`).join('')}</ul></div>
+    </div>
+    <div class="fb-card">
+      <div class="fb-head"><div class="fb-icon" style="background:var(--aml)">📈</div><div class="fb-title">Areas to improve</div></div>
+      <div class="fb-body"><ul>${(fb.improvements||[]).map(s=>`<li>${s}</li>`).join('')}</ul></div>
+    </div>
+    ${fb.grammar_errors&&fb.grammar_errors.length?`
+    <div class="fb-card">
+      <div class="fb-head"><div class="fb-icon" style="background:var(--rel)">🔍</div><div class="fb-title">Grammar corrections</div></div>
+      <div class="fb-body"><ul>${fb.grammar_errors.map(e=>`<li style="font-family:'DM Mono',monospace;font-size:13px">${e}</li>`).join('')}</ul></div>
+    </div>`:''}
+    ${fb.vocabulary_suggestions&&fb.vocabulary_suggestions.length?`
+    <div class="fb-card">
+      <div class="fb-head"><div class="fb-icon" style="background:var(--pul)">💡</div><div class="fb-title">Vocabulary upgrade</div></div>
+      <div class="fb-body"><ul>${fb.vocabulary_suggestions.map(v=>`<li>${v}</li>`).join('')}</ul></div>
+    </div>`:''}
+    ${fb.corrected_intro?`
+    <div class="fb-card">
+      <div class="fb-head"><div class="fb-icon" style="background:var(--bll)">✍️</div><div class="fb-title">Suggested introduction</div></div>
+      <div class="corrected-text">${fb.corrected_intro}</div>
+    </div>`:''}
+  `;
+  sec.style.display='block';
+  sec.scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+// ---- Structure page ----
+function renderTypeTabs(){
+  const types=Object.keys(STRUCTURES);
+  document.getElementById('type-tabs').innerHTML=types.map((t,i)=>
+    `<button class="et-btn ${i===0?'active':''}" onclick="renderStructure('${t}',this)">${STRUCTURES[t].name}</button>`
+  ).join('');
+}
+
+function renderStructure(type,btn){
+  if(btn){ document.querySelectorAll('.et-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); }
+  const s=STRUCTURES[type];
+  document.getElementById('structure-full').innerHTML=s.parts.map((p,i)=>`
+    <div class="sf-part">
+      <div class="sf-header">
+        <div class="sf-num">${i+1}</div>
+        <div class="sf-name">${p.name}</div>
+        <div class="sf-lines">${p.lines}</div>
+      </div>
+      <div class="sf-desc">${p.desc}</div>
+      <div class="sf-example">"${p.example}"</div>
+      <div class="sf-tips">${p.tips.map(t=>`<span class="sf-tip">${t}</span>`).join('')}</div>
+    </div>`).join('');
+}
+
+// ---- Phrases page ----
+function renderPhrases(q){
+  const filtered=q?PHRASES.map(cat=>({...cat,phrases:cat.phrases.filter(p=>p.toLowerCase().includes(q.toLowerCase()))})).filter(c=>c.phrases.length):PHRASES;
+  document.getElementById('phrase-grid').innerHTML=filtered.map(cat=>`
+    <div class="phrase-card">
+      <div class="pc-cat" style="background:${cat.color};color:${cat.tc}">${cat.cat}</div>
+      <div class="pc-phrases">
+        ${cat.phrases.map(p=>`
+          <div class="pc-phrase" onclick="copyPhrase('${p.replace(/'/g,"\\'")}',this)">
+            <div class="pc-text">${p}</div>
+            <div class="pc-copy">copy</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
+}
+
+function searchPhrases(q){ renderPhrases(q); }
+
+function copyPhrase(p,el){
+  navigator.clipboard.writeText(p).then(()=>{
+    const c=el.querySelector('.pc-copy');
+    c.textContent='✓'; c.style.color='var(--gr)';
+    setTimeout(()=>{ c.textContent='copy'; c.style.color=''; },1500);
+  });
+}
+
+// ---- Nav ----
+function goPage(id,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bnav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  btn.classList.add('active');
+}
+
+init();
+</script>
+</body>
+</html>
